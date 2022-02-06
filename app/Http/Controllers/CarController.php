@@ -16,7 +16,8 @@ class CarController extends Controller
     public function index()
     {
         $car = Car::get();;
-        return view('car.index', ['car' => $car]);
+        $brand = Brand::get();
+        return view('car.index', ['cars' => $car, 'brands'=> $brand]);
     }
 
     /**
@@ -28,7 +29,7 @@ class CarController extends Controller
     {
         $brand = Brand::get();
 
-        return view('car.create', ['brand' => $brand]);
+        return view('car.formCar', ['brands' => $brand]);
     }
 
     /**
@@ -41,6 +42,10 @@ class CarController extends Controller
     {
         $car = Car::create($request->all());
 
+        $car = Car::get();;
+        $brand = Brand::get();
+
+        return redirect()->route('cars.index', ['cars' => $car, 'brands'=> $brand]);
     }
 
     /**
@@ -49,9 +54,9 @@ class CarController extends Controller
      * @param  \App\Car  $car
      * @return \Illuminate\Http\Response
      */
-    public function show(Car $car)
+    public function show($id)
     {
-        //
+        return view('car.show', ['car' => Car::findOrFail($id)]);
     }
 
     /**
@@ -60,9 +65,11 @@ class CarController extends Controller
      * @param  \App\Car  $car
      * @return \Illuminate\Http\Response
      */
-    public function edit(Car $car)
+    public function edit($id)
     {
-        //
+        $brand = Brand::get();
+
+        return view('car.formCar', ['brands' => $brand, 'car' => Car::findOrFail($id)]);
     }
 
     /**
@@ -72,9 +79,16 @@ class CarController extends Controller
      * @param  \App\Car  $car
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Car $car)
+    public function update(Request $request, $id)
     {
-        //
+        $car = Car::get();;
+        $brand = Brand::get();
+
+        $car = Car::findOrFail($id);
+        $car->fill($request->all());
+        $car->save();
+
+        return redirect()->route('cars.index', ['cars' => $car, 'brands'=> $brand]);
     }
 
     /**
@@ -83,8 +97,13 @@ class CarController extends Controller
      * @param  \App\Car  $car
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Car $car)
+    public function destroy($id)
     {
-        //
+        Car::destroy($id);
+        
+        $car = Car::get();
+        $brand = Brand::get();
+
+        return redirect()->route('cars.index', ['cars' => $car, 'brands'=> $brand]);
     }
 }
